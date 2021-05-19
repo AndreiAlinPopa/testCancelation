@@ -12,6 +12,7 @@ namespace testCancelation
     {
         static void Main(string[] args)
         {
+
             // Ask user for information
             Console.WriteLine("Enter driving licence: ");
             string drivingLicence = Console.ReadLine();
@@ -21,15 +22,15 @@ namespace testCancelation
             string localDate = DateTime.Now.ToString("dd/MM/yyyy"); // Current 
 
             // Declaring driver
-            IWebDriver cDriver = Global.cDriver;
+            ref IWebDriver cDriver = ref Global.cDriver;
 
 
             //NAVIGATION --> CAR TEST
             cDriver.Navigate().GoToUrl("https://driverpracticaltest.dvsa.gov.uk/application");
 
             //!!CAPTCHA HANDLING
+            while (waitscreenExists()) { }
             while (captchaExists()) { }
-            
 
             IWebElement carTestButton = cDriver.FindElement(By.Name("testTypeCar"));
             carTestButton.Click();
@@ -86,22 +87,14 @@ namespace testCancelation
                     if (!(currentCentre.Contains("No dates found")))
                     {
                         Write_To_Txt(currentCentre + " <-> " + DateTime.Now.ToString());
-                    } 
-                    else
-                    {
                         Console.WriteLine(currentCentre);
                     }
-
-
                 }
 
                 Thread.Sleep(5000);
                 cDriver.Navigate().Refresh();
 
             }
-
-
-            Thread.Sleep(100000);
 
             cDriver.Quit();
         }
@@ -115,6 +108,23 @@ namespace testCancelation
             try
             {
                 IWebElement errorExist = cDriver.FindElement(By.Name("ROBOTS"));
+                return true;
+            }
+            catch (NoSuchElementException)
+            {
+                return false;
+            }
+        }
+
+        static bool waitscreenExists()
+        {
+
+            // Declaring driver
+            IWebDriver cDriver = Global.cDriver;
+
+            try
+            {
+                IWebElement errorExist = cDriver.FindElement(By.ClassName("queue"));
                 return true;
             }
             catch (NoSuchElementException)
